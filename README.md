@@ -20,8 +20,9 @@ This library provides simple wrappers around some OpenGL 4 functionality. It was
             }
         )).fragmentShader(glsl(
             in vec2 coord;
+            out vec4 color;
             void main() {
-                gl_FragColor = vec4(coord, 0.0, 1.0);
+                color = vec4(coord, 0.0, 1.0);
             }
         )).link();
 
