@@ -17,6 +17,12 @@
 #include <math.h>
 
 // Definitions for new macros in case they aren't defined.
+#define GL_R32F 0x822E
+#define GL_RG32F 0x8230
+#define GL_RGB32F 0x8815
+#define GL_RGBA32F 0x8814
+#define GL_PATCHES 0x000E
+#define GL_PATCH_VERTICES 0x8E72
 #define GL_TESS_CONTROL_SHADER 0x8E88
 #define GL_TESS_EVALUATION_SHADER 0x8E87
 
@@ -53,6 +59,7 @@ extern "C" {
     void glBindAttribLocation(GLuint program, GLuint index, const GLchar *name);
     void glVertexAttribPointer(GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const GLvoid *pointer);
     void glDeleteFramebuffers(GLsizei n, GLuint *framebuffers);
+    void glDeleteRenderbuffers(GLsizei n, GLuint *renderbuffers);
     void glDrawBuffers(GLsizei n, const GLenum *bufs);
     void glUniform1i(GLint location, GLint v0);
     void glUniform2i(GLint location, GLint v0, GLint v1);
@@ -71,6 +78,8 @@ extern "C" {
     void glUniform3iv(GLint location, GLsizei count, const GLint *value);
     void glUniform4iv(GLint location, GLsizei count, const GLint *value);
     void glUniformMatrix4fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value);
+    void glPatchParameteri(GLenum pname, GLint value);
+    void glPatchParameterfv(GLenum pname, const GLfloat *values);
     GLuint glCreateShader(GLenum shaderType);
     GLuint glCreateProgram();
     GLuint glCheckFramebufferStatus(GLenum target);
@@ -356,12 +365,16 @@ struct Texture {
 //
 struct FBO {
     unsigned int id;
+    unsigned int renderbuffer;
+    bool autoDepth;
     bool resizeViewport;
     int newViewport[4], oldViewport[4];
+    int renderbufferWidth, renderbufferHeight;
     std::vector<unsigned int> drawBuffers;
 
-    FBO(bool resizeViewport = true) : id(), resizeViewport(resizeViewport), newViewport(), oldViewport() {}
-    ~FBO() { glDeleteFramebuffers(1, &id); }
+    FBO(bool autoDepth = true, bool resizeViewport = true) : id(), renderbuffer(), autoDepth(autoDepth),
+        resizeViewport(resizeViewport), newViewport(), oldViewport(), renderbufferWidth(), renderbufferHeight() {}
+    ~FBO() { glDeleteFramebuffers(1, &id); glDeleteRenderbuffers(1, &renderbuffer); }
 
     // Draw calls between these will be drawn to attachments. If resizeViewport
     // is true this will automatically resize the viewport to the size of the

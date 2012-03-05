@@ -270,6 +270,17 @@ FBO &FBO::detachColor(unsigned int attachment) {
 
 FBO &FBO::check() {
     bind();
+    if (autoDepth) {
+        if (renderbufferWidth != newViewport[2] || renderbufferHeight != newViewport[3]) {
+            renderbufferWidth = newViewport[2];
+            renderbufferHeight = newViewport[3];
+            if (!renderbuffer) glGenRenderbuffers(1, &renderbuffer);
+            glBindRenderbuffer(GL_RENDERBUFFER, renderbuffer);
+            glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT32, renderbufferWidth, renderbufferHeight);
+            glBindRenderbuffer(GL_RENDERBUFFER, 0);
+        }
+        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, renderbuffer);
+    }
     switch (glCheckFramebufferStatus(GL_FRAMEBUFFER)) {
         case GL_FRAMEBUFFER_COMPLETE: break;
         case GL_FRAMEBUFFER_UNDEFINED: printf("GL_FRAMEBUFFER_UNDEFINED\n"); exit(0);
