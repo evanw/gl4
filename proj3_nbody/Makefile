@@ -1,2 +1,2 @@
 build:
-	g++ main.cpp gl4.cpp -lglut
+	g++ -I.. main.cpp ../gl4.cpp -lglut

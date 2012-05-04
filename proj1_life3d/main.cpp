@@ -1,3 +1,4 @@
+#include <GL/glut.h>
 #include "gl4.h"
 
 float width = 0, height = 0;
@@ -13,7 +14,7 @@ vec3 eye = vec3(0.5);
 
 Shader updateShader, displayShader;
 Texture textureA, textureB;
-FBO fbo;
+FBO fbo(false);
 
 Buffer<vec2> quadVertices;
 VAO quadLayout;
